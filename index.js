@@ -7,6 +7,43 @@ function ask(questionText) {
   });
 }
 
+class Inventory{
+  constructor (){
+this.itemList = []
+  } 
+list(){
+if(this.itemList.length === 0){
+console.log("the inventory is empty")
+return
+}
+this.itemList.forEach((item)=>console.log(item))
+} 
+drop(toDrop){
+let dropIndex = this.itemList.indexOf(toDrop)
+if(dropIndex === -1){
+console.log("there is no "+ toDrop)
+} else{
+  let dropItem = this.itemList[dropIndex]
+  this.itemList.splice(dropIndex,1)
+  return dropItem
+}
+
+
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 start();
 
 async function start() {
