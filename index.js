@@ -35,7 +35,71 @@ console.log("there is no "+ toDrop)
 }
 }
 
-
+class Room{
+  //constructor takes room name, and a description string, and sets up empty connections and inventory
+  constructor(name, description){
+      this.name = name;
+      this.description = description;
+      this.north = false;
+      this.east = false;
+      this.south = false;
+      this.west = false;
+      this.other = false;
+      this.doors = 0;
+      this.lock = [false,false,false,false];
+      this.inv = new Inventory();
+  }
+  //add connection takes a direction and room, and optional locking data
+  //lockedArray is optional, but if present should be two strings
+  //lockedArray[0] should be the item to unlock with
+  //lockedArray[1] should be the text when trying to open without the key item
+  addConnection(direction, otherRoom, lockedArray){
+    //increment door counter
+      this.doors++;
+      otherRoom.doors++;
+      //add connections to appropriate directions
+      switch(direction){
+          case 'north':
+              this.north = otherRoom;
+              otherRoom.south = this;
+              if(locked){
+                  this.lock[0] = lockedArray;
+              }
+              break;
+          case 'east':
+              this.east = otherRoom;
+              otherRoom.west = this;
+              if(locked){
+                  this.lock[1] = lockedArray;
+              }
+              break;
+          case 'south':
+              this.south = otherRoom;
+              otherRoom.north = this;
+              if(locked){
+                  this.lock[2] = lockedArray;
+              }
+              break;
+          case 'west':
+              this.west = otherRoom;
+              otherRoom.east = this;
+              if(locked){
+                  this.lock[3] = lockedArray;
+              }
+              break;
+          case 'other':
+              this.other = otherRoom;
+              otherRoom.other = this;
+              if(locked){
+                  this.lock[4] = lockedArray;
+              }
+              break;
+          //if invalid direction, throw an error
+          default:
+              throw 'tried to add room connection with invalid direction';
+      }
+  }
+}
 
 
 
