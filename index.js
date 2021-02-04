@@ -108,12 +108,20 @@ let room3 = new Room ("Stairwell Up", "You are in a small room with a broken sta
 let room4 = new Room ("Stairwell Down", "You are in a room of carved stone with a staircase going down. You can see a hole in the wall in one of the corners.")
 let room5 = new Room ("Basement", "You are in a large room that is poorly lit. It looks to have been used as a storeroom in the past.") 
 let room6 = new Room ("Aboveground Room", "You are in a wooden room with small windows. You can see the outdoors through them. There is a door with a heavy padlock on it.")
+//setting up room inventories
 room5.inv.itemList.push("box")
 room6.inv.itemList.push("cheese")
-
-
-
-
+//setting up room connections
+room1.addConnection("north", room2)
+room2.addConnection("north", room3)
+room2.addConnection("west", room4, ["key", "The door is locked, you need to find a key."])
+room3.addConnection("other", room6, ["ladder", "The stairs are to broken to climb"]) 
+room4.addConnection("other", room5)
+//setting up player object
+let player = {
+  currentRoom : room1,
+  inv : new Inventory()
+ } 
 
 
 start();
