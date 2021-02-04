@@ -123,6 +123,177 @@ let player = {
   inv : new Inventory()
  } 
 
+ //parse input takes a string of player input and turns it into an action
+ function parseInput(inputString){
+   //trim input and turn it into an array
+  inputString = inputString.trim().toLowerCase();
+  let inputArr = inputString.split(' ');
+  //look at the first word to determine the action type
+  switch(inputArr[0]){
+    //if second word doesn't exit, ask what to perform action on
+      case 'open':
+          if(inputArr[1] === undefined){
+              console.log(inputArr[0] + ' what?');
+              break;
+          }
+          //handle unique cases
+          //open box to find ladder
+          if(inputArr[1] === 'box' && player.currentRoom.inv.itemList.includes('box')){
+            console.log('You open the box and find a ladder inside.');
+            player.currentRoom.inv.drop('box');
+            player.currentRoom.inv.itemList.push('ladder');
+            break;
+          }
+          //open final door to win game
+          if(player.currentRoom.name === 'Aboveground Room' && inputArr[1] === 'door'){
+            if(player.inv.itemList.includes('key')){
+              console.log('You unlock the door and go through. The fresh air of the outdoors is a welcome change after having been trapped underground.')
+              console.log('Congratulations! You Win!');
+              process.exit();
+            }else{
+              console.log('The door is locked.');
+              break;
+            }
+          }
+          //handle opening doors
+          if(inputArr[1] === 'door'){
+            if(player.currentRoom.doors === 0){
+              console.log('This room has no doors.');
+              break;
+            }
+            let doorDirection = undefined;
+            let lockNum = -1;
+            //handle rooms with multiple doors
+            if(player.currentRoom.doors > 1){
+              if(inputArr[2] === 'north'){
+                doorDirection = inputArr[2];
+                lockNum = 0;
+              }else if(inputArr[2] === 'east'){
+                doorDirection = inputArr[2];
+                lockNum = 1;
+              }else if(inputArr[2] === 'south'){
+                doorDirection = inputArr[2];
+                lockNum = 2;
+              }else if(inputArr[2] === 'west'){
+                doorDirection = inputArr[2];
+                lockNum = 3;
+              }else{
+                console.log('Open which door?');
+                break;
+              }
+            }else{
+              //find the direction of the door in a room with one door
+              if(player.currentRoom.north){
+                doorDirection = 'north';
+                lockNum = 0;
+              }else if(player.currentRoom.east){
+                doorDirection = 'east';
+                lockNum = 1;
+              }else if(player.currentRoom.south){
+                doorDirection = 'south';
+                lockNum = 2;
+              }else if(player.currentRoom.west){
+                doorDirection = 'west';
+                lockNum = 3;
+              }
+            }
+            //check if door is locked
+            if(player.currentRoom.lock[lockNum]){
+              if(player.inv.itemList.includes(player.currentRoom.lock[lockNum][0])){
+                player.inv.drop(player.currentRoom.lock[lockNum][0]);
+                player.currentRoom.lock[lockNum] = false;
+              }else{
+                console.log(player.currentRoom.lock[lockNum][1]);
+                break;
+              }
+            }
+            //change rooms
+            player.currentRoom = player.currentRoom[doorDirection];
+            console.log(player.currentRoom.description);
+            break;
+          }
+          //handle invalid second words
+          console.log(inputArr[0] + ' what?');
+          break;
+      case 'climb':
+          //check if there is a connection in the other slot
+          if(!player.currentRoom.other){
+            console.log('There is nothing to climb here.');
+            break;
+          }
+          //check if the connection is locked
+          if(player.currentRoom.lock[4]){
+            //if player or room inventories has unlock item, unlock, else print locked text
+            if(player.inv.itemList.includes(player.currentRoom.lock[4][0])){
+              player.currentRoom.lock[4] = false;
+              player.inv.drop('ladder');
+              player.currentRoom.description += " A ladder has been placed to allow you to climb despite the broken stairs."
+            }else if(player.currentRoom.inv.itemList.includes(player.currentRoom.lock[4][0])){
+              player.currentRoom.lock[4] = false;
+              player.currentRoom.inv.drop('ladder');
+              player.currentRoom.description += " A ladder has been placed to allow you to climb despite the broken stairs."
+            }else{
+              console.log(player.currentRoom.lock[4][1]);
+              break;
+            }
+          }
+          //change rooms
+          player.currentRoom = player.currentRoom.other;
+          console.log(player.currentRoom.description);
+          break;
+      case 'examine':
+          if(inputArr[1] === undefined){
+              console.log(inputArr[0] + ' what?');
+              break;
+          }
+          break;
+      case 'take':
+          if(inputArr[1] === undefined){
+              console.log(inputArr[0] + ' what?');
+              break;
+          }
+          //make sure item exists and take it, if it's not a box
+          let itemToTake = undefined;
+          if(itemToTake = player.currentRoom.inv.drop(inputArr[1])){
+              switch(inputArr[1]){
+                  case 'box':
+                      console.log("You can't carry that!");
+                      player.currentRoom.inv.itemList.push(itemToTake);
+                      break;
+                  default:
+                      console.log("You took the " + inputArr[1]);
+                      player.inv.itemList.push(itemToTake);
+              }
+          }
+          break;
+      case 'drop':
+          if(inputArr[1] === undefined){
+              console.log(inputArr[0] + ' what?');
+              break;
+          }
+          //make sure item exists, and put it in the room inventory
+          let itemToDrop = undefined;
+          if(itemToDrop = player.inv.drop(inputArr[1])){
+            player.currentRoom.inv.itemList.push(itemToDrop);
+            console.log('You dropped the ' + itemToDrop);
+          }
+          //check if cheese is dropped in room 4
+          if(player.currentRoom.name === "Stairwell Down" && itemToDrop === "cheese"){
+            console.log('As soon as you drop the cheese, a rat shoots out of the hole dragging something shiny behind it. It grabs the cheese and returns to the hole, but it leaves a key behind.');
+            room4.inv.drop('cheese');
+            room4.inv.itemList.push('key');
+          }
+          break;
+      case 'help':
+          console.log('Valid actions are open, climb, examine, take, and drop');
+          break;
+          //if word is not valid action, say I don't know how to do it
+      default:
+          console.log("I don't know how to " + inputArr[0]);
+          break;
+  }
+}
+
 
 start();
 
