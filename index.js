@@ -8,16 +8,19 @@ function ask(questionText) {
 }
 
 class Inventory{
+  //we used the constructor to create an empty array to hold items
   constructor (){
 this.itemList = []
   } 
+  //the list will display the inventory to the console
 list(){
 if(this.itemList.length === 0){
-console.log("the inventory is empty")
+console.log("nothing")
 return
 }
 this.itemList.forEach((item)=>console.log(item))
 } 
+//the drop function removes an item from the inventory
 drop(toDrop){
 let dropIndex = this.itemList.indexOf(toDrop)
 if(dropIndex === -1){
