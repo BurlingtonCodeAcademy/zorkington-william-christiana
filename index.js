@@ -153,6 +153,13 @@ class Room{
               console.log('This room has no doors.');
               break;
             }
+            //make sure direction given has door
+            if(inputArr[2] === 'north' || inputArr[2] === 'east' || inputArr[2] === 'south' || inputArr[2] === 'west'){
+              if(!player.currentRoom[inputArr[2]]){
+                console.log('There is no door on the ' + inputArr[2] + ' wall.');
+                break;
+              }
+            }
             let doorDirection = undefined;
             let lockNum = -1;
             //handle rooms with multiple doors
