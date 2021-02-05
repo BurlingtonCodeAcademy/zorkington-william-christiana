@@ -220,7 +220,7 @@ class Room{
             }
             console.log(doorCloseText);
             player.currentRoom = player.currentRoom[doorDirection];
-            console.log(player.currentRoom.description);
+            parseInput('examine room');
             break;
           }
           //handle invalid second words
@@ -250,7 +250,7 @@ class Room{
           }
           //change rooms
           player.currentRoom = player.currentRoom.other;
-          console.log(player.currentRoom.description);
+          parseInput('examine room');
           break;
       case 'examine':
           if(inputArr[1] === undefined){
@@ -425,7 +425,7 @@ class Room{
 
 async function start() {
   console.log('Type help for a list of commands.')
-  console.log(player.currentRoom.description);
+  parseInput('examine room');
   while(true){
     console.log('');
     console.log('Current Room - ' + player.currentRoom.name);
