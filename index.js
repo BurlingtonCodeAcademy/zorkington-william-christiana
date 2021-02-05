@@ -7,6 +7,8 @@ function ask(questionText) {
   });
 }
 
+//classes
+
 class Inventory{
   //we used the constructor to create an empty array to hold items
   constructor (){
@@ -15,7 +17,7 @@ this.itemList = []
   //the list will display the inventory to the console
 list(){
 if(this.itemList.length === 0){
-console.log("nothing")
+console.log("Nothing")
 return
 }
 this.itemList.forEach((item)=>console.log(item))
@@ -24,7 +26,7 @@ this.itemList.forEach((item)=>console.log(item))
 drop(toDrop){
 let dropIndex = this.itemList.indexOf(toDrop)
 if(dropIndex === -1){
-console.log("there is no "+ toDrop)
+console.log("There is no "+ toDrop)
 } else{
   let dropItem = this.itemList[dropIndex]
   this.itemList.splice(dropIndex,1)
@@ -54,43 +56,48 @@ class Room{
   //lockedArray[0] should be the item to unlock with
   //lockedArray[1] should be the text when trying to open without the key item
   addConnection(direction, otherRoom, lockedArray){
-    //increment door counter
-      this.doors++;
-      otherRoom.doors++;
       //add connections to appropriate directions
       switch(direction){
           case 'north':
+              this.doors++;
+              otherRoom.doors++;
               this.north = otherRoom;
               otherRoom.south = this;
-              if(locked){
+              if(lockedArray){
                   this.lock[0] = lockedArray;
               }
               break;
           case 'east':
+              this.doors++;
+              otherRoom.doors++;
               this.east = otherRoom;
               otherRoom.west = this;
-              if(locked){
+              if(lockedArray){
                   this.lock[1] = lockedArray;
               }
               break;
           case 'south':
+              this.doors++;
+              otherRoom.doors++;
               this.south = otherRoom;
               otherRoom.north = this;
-              if(locked){
+              if(lockedArray){
                   this.lock[2] = lockedArray;
               }
               break;
           case 'west':
+              this.doors++;
+              otherRoom.doors++;
               this.west = otherRoom;
               otherRoom.east = this;
-              if(locked){
+              if(lockedArray){
                   this.lock[3] = lockedArray;
               }
               break;
           case 'other':
               this.other = otherRoom;
               otherRoom.other = this;
-              if(locked){
+              if(lockedArray){
                   this.lock[4] = lockedArray;
               }
               break;
@@ -101,27 +108,7 @@ class Room{
   }
 }
 
-//setup rooms
-let room1 = new Room ("Starting Room", "You are in a square room of carved stone with wooden supports. It is dimly lit by candles on the walls and you can see some cobwebs in the corners.") 
-let room2 = new Room ("Main Room", "You are in a large room of carved stone with arched ceilings. The walls have large patches that are discolored by mold and water damage, and the air is stagnant.")
-let room3 = new Room ("Stairwell Up", "You are in a small room with a broken staircase going up. Too much has collapsed to be able to climb it, but who knows what you might find in the rubble?")
-let room4 = new Room ("Stairwell Down", "You are in a room of carved stone with a staircase going down. You can see a hole in the wall in one of the corners.")
-let room5 = new Room ("Basement", "You are in a large room that is poorly lit. It looks to have been used as a storeroom in the past.") 
-let room6 = new Room ("Aboveground Room", "You are in a wooden room with small windows. You can see the outdoors through them. There is a door with a heavy padlock on it.")
-//setting up room inventories
-room5.inv.itemList.push("box")
-room6.inv.itemList.push("cheese")
-//setting up room connections
-room1.addConnection("north", room2)
-room2.addConnection("north", room3)
-room2.addConnection("west", room4, ["key", "The door is locked, you need to find a key."])
-room3.addConnection("other", room6, ["ladder", "The stairs are to broken to climb"]) 
-room4.addConnection("other", room5)
-//setting up player object
-let player = {
-  currentRoom : room1,
-  inv : new Inventory()
- } 
+//functions
 
  //parse input takes a string of player input and turns it into an action
  function parseInput(inputString){
@@ -154,6 +141,11 @@ let player = {
               console.log('The door is locked.');
               break;
             }
+          }
+          //if player input "direction door" instead of "door direction" swap inputArr[1] and [2]
+          if(inputArr[2] === 'door' && (inputArr[1] === 'north' || inputArr[1] === 'east' || inputArr[1] === 'south' || inputArr[1] === 'west')){
+            inputArr[2] = inputArr[1];
+            inputArr[1] = 'door';
           }
           //handle opening doors
           if(inputArr[1] === 'door'){
@@ -246,6 +238,120 @@ let player = {
               console.log(inputArr[0] + ' what?');
               break;
           }
+          //examine room, get description again, find doors, and view room inventory
+          if(inputArr[1] === 'room'){
+            console.log(player.currentRoom.description);
+            if(player.currentRoom.doors > 0){
+              let doorString = "There is a door on the ";
+              let directionString = '';
+              if(player.currentRoom.north){
+                directionString += 'north';
+              }
+              if(player.currentRoom.east){
+                if(directionString === ''){
+                  directionString += 'east';
+                }else{
+                  directionString += ', east';
+                }
+              }
+              if(player.currentRoom.south){
+                if(directionString === ''){
+                  directionString += 'south';
+                }else{
+                  directionString += ', south';
+                }
+              }
+              if(player.currentRoom.west){
+                if(directionString === ''){
+                  directionString += 'west';
+                }else{
+                  directionString += ', west';
+                }
+              }
+              doorString += directionString + ' wall.';
+              if(player.currentRoom.doors > 1){
+                doorString = doorString.replace('is a door', 'are doors');
+                doorString = doorString.replace('wall','walls');
+                doorString = doorString.slice(0, doorString.lastIndexOf(',') + 1) + ' and' + doorString.slice(doorString.lastIndexOf(',') + 1);
+              }
+              console.log(doorString);
+            }
+            console.log('You check the ground and find: ');
+            player.currentRoom.inv.list();
+            break;
+          }
+          //view player inventory
+          if(inputArr[1] === 'inventory'){
+            console.log('Your inventory currently contains: ');
+            player.inv.list();
+            break;
+          }
+          //room specific examine targets
+          //broken staircase in room 3
+          if(player.currentRoom.name === 'Stairwell Up' && (inputArr[1] === 'staircase' || inputArr[1] === 'stairs' || inputArr[1] === 'rubble')){
+            if(room2.lock[3] && !player.inv.itemList.includes('key') && !room1.inv.itemList.includes('key') && !room2.inv.itemList.includes('key') && !room3.inv.itemList.includes('key')){
+              console.log('You check the rubble left by the broken staircase and discover a key hidden within.');
+              room3.inv.itemList.push('key');
+              break;
+            }else{
+              console.log('You check the rubble again, but there is nothing of interest left.');
+              break;
+            }
+          }
+          //hole in room 4
+          if(player.currentRoom.name === 'Stairwell Down' && inputArr[1] === 'hole'){
+            console.log('You check the hole and though it is much too small to enter you think you see small eyes and hear squeaking.');
+            break;
+          }
+          //windows in room 6
+          if(player.currentRoom.name === 'Aboveground Room' && (inputArr[1] === 'window' || inputArr[1] === 'windows')){
+            console.log('You gaze longingly at the greenery outside.');
+            break;
+          }
+          //doors and stairs
+          if(inputArr[1] === 'door'){
+            if(player.currentRoom.doors > 0){
+              console.log("It's a door made of heavy wood and iron.");
+              break;
+            }else if(player.currentRoom.name === 'Aboveground Room'){
+              console.log("It's the last thing between you and fresh air.");
+              break;
+            }else{
+              console.log('This room has no doors.');
+              break;
+            }
+          }
+          if(inputArr[1] === 'staircase' || inputArr[1] === 'stairs'){
+            if(player.currentRoom.name === 'Aboveground Room' || player.currentRoom.name === 'Stairwell Down'){
+              console.log("The stairs head downwards.");
+              break;
+            }else if(player.currentRoom.name === 'Basement'){
+              console.log('The stairs head upwards.');
+              break;
+            }else{
+              console.log('There are no stairs in this room.');
+              break;
+            }
+          }
+          //items
+          if(inputArr[1] === 'key' && (player.inv.itemList.includes(inputArr[1]) || player.currentRoom.inv.itemList.includes(inputArr[1]))){
+            console.log("It's shiny despite the small patches of rust. Perhaps it can unlock something?");
+            break;
+          }
+          if(inputArr[1] === 'box' &&  player.currentRoom.inv.itemList.includes(inputArr[1])){
+            console.log("A box that's much too large to move. Maybe it contains some sort of treasure!");
+            break;
+          }
+          if(inputArr[1] === 'ladder' && (player.inv.itemList.includes(inputArr[1]) || player.currentRoom.inv.itemList.includes(inputArr[1]))){
+            console.log('A ladder you found in a box. Is there somewhere you can reach with it?');
+            break;
+          }
+          if(inputArr[1] === 'cheese' && (player.inv.itemList.includes(inputArr[1]) || player.currentRoom.inv.itemList.includes(inputArr[1]))){
+            console.log("A small piece of old cheese. It stinks a little...");
+            break;
+          }
+          //if invalid examine target, find nothing
+          console.log('You find nothing of interest.');
           break;
       case 'take':
           if(inputArr[1] === undefined){
@@ -286,6 +392,9 @@ let player = {
           break;
       case 'help':
           console.log('Valid actions are open, climb, examine, take, and drop');
+          console.log('Make sure to say what to take action on.')
+          console.log('If you want to open a door in a room with multiple doors, make sure to give a complete compass direction after door.');
+          console.log('Room and inventory are valid targets to examine.');
           break;
           //if word is not valid action, say I don't know how to do it
       default:
@@ -294,15 +403,38 @@ let player = {
   }
 }
 
-
-start();
-
 async function start() {
-  const welcomeMessage = `182 Main St.
-You are standing on Main Street between Church and South Winooski.
-There is a door here. A keypad sits on the handle.
-On the door is a handwritten sign.`;
-  let answer = await ask(welcomeMessage);
-  console.log('Now write your code to make this work!');
-  process.exit();
+  console.log('Type help for a list of commands.')
+  console.log(player.currentRoom.description);
+  while(true){
+    console.log(player.currentRoom.name);
+    parseInput(await ask('>_'));
+  }
 }
+
+//begin code execution
+
+//setup rooms
+let room1 = new Room ("Starting Room", "You are in a square room of carved stone with wooden supports. It is dimly lit by candles on the walls and you can see some cobwebs in the corners.") 
+let room2 = new Room ("Main Room", "You are in a large room of carved stone with arched ceilings. The walls have large patches that are discolored by mold and water damage, and the air is stagnant.")
+let room3 = new Room ("Stairwell Up", "You are in a small room with a broken staircase going up. Too much has collapsed to be able to climb it, but who knows what you might find in the rubble?")
+let room4 = new Room ("Stairwell Down", "You are in a room of carved stone with a staircase going down. You can see a hole in the wall in one of the corners.")
+let room5 = new Room ("Basement", "You are in a large room that is poorly lit. It looks to have been used as a storeroom in the past. There is a staircase going up.") 
+let room6 = new Room ("Aboveground Room", "You are in a wooden room with small windows. You can see the outdoors through them. There is a door with a heavy padlock on it. There is a broken staircase going down, with a ladder placed to allow you to climb it anyway.")
+//setting up room inventories
+room5.inv.itemList.push("box")
+room6.inv.itemList.push("cheese")
+//setting up room connections
+room1.addConnection("north", room2)
+room2.addConnection("north", room3)
+room2.addConnection("west", room4, ["key", "The door is locked, you need to find a key."])
+room3.addConnection("other", room6, ["ladder", "The stairs are too broken to climb"]) 
+room4.addConnection("other", room5)
+//setting up player object
+let player = {
+  currentRoom : room1,
+  inv : new Inventory()
+ } 
+
+ //start game loop
+start();
