@@ -131,6 +131,11 @@ class Room{
             player.currentRoom.inv.itemList.push('ladder');
             break;
           }
+          //if player input "direction door" instead of "door direction" swap inputArr[1] and [2]
+          if(inputArr[2] === 'door' && (inputArr[1] === 'north' || inputArr[1] === 'east' || inputArr[1] === 'south' || inputArr[1] === 'west')){
+            inputArr[2] = inputArr[1];
+            inputArr[1] = 'door';
+          }
           //open final door to win game
           if(player.currentRoom.name === 'Aboveground Room' && inputArr[1] === 'door'){
             if(player.inv.itemList.includes('key')){
@@ -141,11 +146,6 @@ class Room{
               console.log('The door is locked.');
               break;
             }
-          }
-          //if player input "direction door" instead of "door direction" swap inputArr[1] and [2]
-          if(inputArr[2] === 'door' && (inputArr[1] === 'north' || inputArr[1] === 'east' || inputArr[1] === 'south' || inputArr[1] === 'west')){
-            inputArr[2] = inputArr[1];
-            inputArr[1] = 'door';
           }
           //handle opening doors
           if(inputArr[1] === 'door'){
@@ -200,6 +200,7 @@ class Room{
             if(player.currentRoom.lock[lockNum]){
               if(player.inv.itemList.includes(player.currentRoom.lock[lockNum][0])){
                 player.inv.drop(player.currentRoom.lock[lockNum][0]);
+                console.log('You use the ' + player.currentRoom.lock[lockNum][0] + ' and move to the next room');
                 player.currentRoom.lock[lockNum] = false;
               }else{
                 console.log(player.currentRoom.lock[lockNum][1]);
@@ -207,6 +208,17 @@ class Room{
               }
             }
             //change rooms
+            let doorCloseText = 'You enter the new room closing the ';
+            if(doorDirection === 'north'){
+              doorCloseText += 'south door behind you.';
+            }else if(doorDirection === 'east'){
+              doorCloseText += 'west door behind you.';
+            }else if(doorDirection === 'south'){
+              doorCloseText += 'north door behind you.';
+            }else if(doorDirection === 'west'){
+              doorCloseText += 'east door behind you.';
+            }
+            console.log(doorCloseText);
             player.currentRoom = player.currentRoom[doorDirection];
             console.log(player.currentRoom.description);
             break;
