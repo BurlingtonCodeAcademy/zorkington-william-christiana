@@ -246,7 +246,7 @@ class Room{
               break;
           }
           //examine room, get description again, find doors, and view room inventory
-          if(inputArr[1] === 'room'){
+          if(inputArr[1] === 'room' || inputArr[1] === player.currentRoom.name.toLowerCase() || inputArr[1] + ' ' + inputArr[2] === player.currentRoom.name.toLowerCase()){
             console.log(player.currentRoom.description);
             if(player.currentRoom.doors > 0){
               let doorString = "There is a door on the ";
@@ -295,7 +295,7 @@ class Room{
           }
           //room specific examine targets
           //broken staircase in room 3
-          if(player.currentRoom.name === 'Stairwell Up' && (inputArr[1] === 'staircase' || inputArr[1] === 'stairs' || inputArr[1] === 'rubble')){
+          if(player.currentRoom.name === 'Stairwell Up' && (inputArr[1] === 'staircase' || inputArr[1] === 'stairs' || inputArr[1] === 'rubble' || inputArr[1] === 'stairwell')){
             if(room2.lock[3] && !player.inv.itemList.includes('key') && !room1.inv.itemList.includes('key') && !room2.inv.itemList.includes('key') && !room3.inv.itemList.includes('key')){
               console.log('You check the rubble left by the broken staircase and discover a key hidden within.');
               room3.inv.itemList.push('key');
@@ -328,7 +328,7 @@ class Room{
               break;
             }
           }
-          if(inputArr[1] === 'staircase' || inputArr[1] === 'stairs'){
+          if(inputArr[1] === 'staircase' || inputArr[1] === 'stairs' || inputArr[1] === 'stairwell'){
             if(player.currentRoom.name === 'Aboveground Room' || player.currentRoom.name === 'Stairwell Down'){
               console.log("The stairs head downwards.");
               break;
@@ -414,7 +414,8 @@ async function start() {
   console.log('Type help for a list of commands.')
   console.log(player.currentRoom.description);
   while(true){
-    console.log(player.currentRoom.name);
+    console.log('');
+    console.log('Current Room - ' + player.currentRoom.name);
     parseInput(await ask('>_'));
   }
 }
