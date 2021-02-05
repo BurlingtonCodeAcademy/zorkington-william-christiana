@@ -413,7 +413,8 @@ class Room{
           console.log('Valid actions are open, climb, examine, take, and drop');
           console.log('Make sure to say what to take action on.')
           console.log('If you want to open a door in a room with multiple doors, make sure to give a complete compass direction after door.');
-          console.log('Room and inventory are valid targets to examine.');
+          console.log('To find information about the room, examine room.');
+          console.log('To find out what you are carrying, examine inventory.');
           break;
           //if word is not valid action, say I don't know how to do it
       default:
